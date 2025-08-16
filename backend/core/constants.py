@@ -5,7 +5,7 @@ Contains default values that can be overridden by environment variables
 
 # Application Info
 APP_NAME = "ClipForge"
-APP_VERSION = "1.0.0"
+APP_VERSION = "0.9"
 
 # JWT Settings (algorithms and structure, not secrets)
 JWT_ALGORITHM = "HS256"
