@@ -1008,6 +1008,11 @@ async function createClip() {
         include_metadata: true
     };
 
+    // Include session_key if a specific session is selected
+    if (currentSessionData && currentSessionData.session && currentSessionData.session.session_key) {
+        clipRequest.session_key = currentSessionData.session.session_key;
+    }
+
     try {
         showCreationStatus('🎬 Creating your clip... This may take a few moments.', 'loading');
         

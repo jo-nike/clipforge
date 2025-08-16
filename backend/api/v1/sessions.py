@@ -137,6 +137,7 @@ async def get_all_user_sessions(
 async def generate_preview_frames(
     start_time: Optional[str] = None,
     end_time: Optional[str] = None,
+    session_key: Optional[str] = None,
     _: str = Depends(setup_request_context),
     user_and_token: Tuple = Depends(get_authenticated_user_with_plex_token),
     clip_service: ClipProcessingService = Depends(get_clip_processing_service),
@@ -162,18 +163,31 @@ async def generate_preview_frames(
                 detail="At least one time (start_time or end_time) must be provided",
             )
 
-        # Get user's current session
-        session = await plex_service.get_current_session(plex_token, current_user.username)
-
-        if not session:
-            logger.warning(
-                f"No active session found for preview frames for user {current_user.username}",
-                extra={"user_id": current_user.user_id},
-            )
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="No active playback session found",
-            )
+        # Get user's session (specific session if key provided, otherwise current session)
+        if session_key:
+            logger.debug(f"Using specific session {session_key} for preview frames for user {current_user.username}")
+            session = await plex_service.get_session_by_key(plex_token, current_user.username, session_key)
+            if not session:
+                logger.warning(
+                    f"Specified session {session_key} not found for preview frames for user {current_user.username}",
+                    extra={"user_id": current_user.user_id},
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Specified session not found",
+                )
+        else:
+            logger.debug(f"Using current session for preview frames for user {current_user.username}")
+            session = await plex_service.get_current_session(plex_token, current_user.username)
+            if not session:
+                logger.warning(
+                    f"No active session found for preview frames for user {current_user.username}",
+                    extra={"user_id": current_user.user_id},
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="No active playback session found",
+                )
 
         # Generate preview frames using the service
         preview_result = await clip_service.generate_preview_frames(
@@ -231,18 +245,31 @@ async def create_snapshot(
             extra={"user_id": current_user.user_id, "timestamp": request.timestamp},
         )
 
-        # Get user's current session
-        session = await plex_service.get_current_session(plex_token, current_user.username)
-
-        if not session:
-            logger.warning(
-                f"No active session found for snapshot for user {current_user.username}",
-                extra={"user_id": current_user.user_id},
-            )
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="No active playback session found",
-            )
+        # Get user's session (specific session if key provided, otherwise current session)
+        if request.session_key:
+            logger.debug(f"Using specific session {request.session_key} for snapshot for user {current_user.username}")
+            session = await plex_service.get_session_by_key(plex_token, current_user.username, request.session_key)
+            if not session:
+                logger.warning(
+                    f"Specified session {request.session_key} not found for snapshot for user {current_user.username}",
+                    extra={"user_id": current_user.user_id},
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Specified session not found",
+                )
+        else:
+            logger.debug(f"Using current session for snapshot for user {current_user.username}")
+            session = await plex_service.get_current_session(plex_token, current_user.username)
+            if not session:
+                logger.warning(
+                    f"No active session found for snapshot for user {current_user.username}",
+                    extra={"user_id": current_user.user_id},
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="No active playback session found",
+                )
 
         # Create the snapshot using the service
         snapshot_response = await clip_service.create_snapshot(
@@ -298,18 +325,31 @@ async def create_multi_frame_snapshots(
             },
         )
 
-        # Get user's current session
-        session = await plex_service.get_current_session(plex_token, current_user.username)
-
-        if not session:
-            logger.warning(
-                f"No active session found for multi-frame snapshots for user {current_user.username}",
-                extra={"user_id": current_user.user_id},
-            )
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="No active playback session found",
-            )
+        # Get user's session (specific session if key provided, otherwise current session)
+        if request.session_key:
+            logger.debug(f"Using specific session {request.session_key} for multi-frame snapshots for user {current_user.username}")
+            session = await plex_service.get_session_by_key(plex_token, current_user.username, request.session_key)
+            if not session:
+                logger.warning(
+                    f"Specified session {request.session_key} not found for multi-frame snapshots for user {current_user.username}",
+                    extra={"user_id": current_user.user_id},
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Specified session not found",
+                )
+        else:
+            logger.debug(f"Using current session for multi-frame snapshots for user {current_user.username}")
+            session = await plex_service.get_current_session(plex_token, current_user.username)
+            if not session:
+                logger.warning(
+                    f"No active session found for multi-frame snapshots for user {current_user.username}",
+                    extra={"user_id": current_user.user_id},
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="No active playback session found",
+                )
 
         # Create the multi-frame snapshots using the service
         multi_frame_response = await clip_service.create_multi_frame_snapshots(

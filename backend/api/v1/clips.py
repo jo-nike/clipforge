@@ -56,15 +56,25 @@ async def create_clip(
             extra={"user_id": current_user.user_id},
         )
 
-        # Get user's current session
-        session = await plex_service.get_current_session(plex_token, current_user.username)
-
-        if not session:
-            logger.warning(f"No active session found for user {current_user.username}")
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="No active playback session found",
-            )
+        # Get user's session (specific session if key provided, otherwise current session)
+        if request.session_key:
+            logger.debug(f"Using specific session {request.session_key} for user {current_user.username}")
+            session = await plex_service.get_session_by_key(plex_token, current_user.username, request.session_key)
+            if not session:
+                logger.warning(f"Specified session {request.session_key} not found for user {current_user.username}")
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Specified session not found",
+                )
+        else:
+            logger.debug(f"Using current session for user {current_user.username}")
+            session = await plex_service.get_current_session(plex_token, current_user.username)
+            if not session:
+                logger.warning(f"No active session found for user {current_user.username}")
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="No active playback session found",
+                )
 
         # Create the clip using the service
         clip_response = await clip_service.create_clip(

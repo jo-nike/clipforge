@@ -312,6 +312,7 @@ class ClipRequest(BaseModel):
     format: str = Field(default="mp4", description="Output format")
     title: Optional[str] = Field(None, max_length=200, description="Custom clip title")
     include_metadata: bool = Field(default=True, description="Include metadata in the clip")
+    session_key: Optional[str] = Field(None, description="Specific session key to use for clip creation")
 
     @field_validator("start_time", "end_time")
     @classmethod
@@ -357,6 +358,7 @@ class SnapshotRequest(BaseModel):
     timestamp: str = Field(..., description="Timestamp in HH:MM:SS or MM:SS format")
     quality: str = Field(default="medium", description="Image quality setting")
     format: str = Field(default="jpg", description="Image format")
+    session_key: Optional[str] = Field(None, description="Specific session key to use for snapshot creation")
 
     @field_validator("timestamp")
     @classmethod
@@ -397,6 +399,7 @@ class MultiFrameRequest(BaseModel):
     frame_interval: float = Field(
         default=0.5, ge=0.1, le=10.0, description="Interval between frames in seconds"
     )
+    session_key: Optional[str] = Field(None, description="Specific session key to use for multi-frame snapshot creation")
 
     @field_validator("center_timestamp")
     @classmethod
