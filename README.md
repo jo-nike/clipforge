@@ -2,6 +2,8 @@
 
 ClipForge is a web-based video clipping application that allows you to create clips from your Plex media server sessions. Monitor what's currently playing, generate precise video clips with frame-accurate trimming, and manage your video collection through an intuitive web interface.
 
+[![Watch the video](https://raw.githubusercontent.com/jo-nike/clipforge/main/assets/thumbnail.jpg)](https://raw.githubusercontent.com/jo-nike/clipforge/first_version/demo/demo.mp4))
+
 ## Features
 
 - **Live Session Monitoring**: Track active Plex media server sessions in real-time
