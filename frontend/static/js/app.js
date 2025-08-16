@@ -738,7 +738,6 @@ function displayAllUserSessions(sessionData) {
         const state = sessionInfo.state || 'unknown';
         const viewOffset = sessionInfo.view_offset || 0;
         
-        
         sessionsHtml += `
             <div class="session-card ${index === 0 ? 'selected-session' : ''}" data-session-index="${index}">
                 <div class="session-header-compact" onclick="selectSession(${index})">
@@ -1104,7 +1103,10 @@ async function createSnapshot() {
                 frame_count_after: 12,
                 format: 'jpg',
                 quality: 'high',
-                frame_interval: 0.5
+                frame_interval: 0.5,
+                ...(currentSessionData && currentSessionData.session && currentSessionData.session.session_key && {
+                    session_key: currentSessionData.session.session_key
+                })
             })
         });
         
@@ -2113,6 +2115,11 @@ async function previewSelection() {
     if (hasEndTime) {
         const endTime = `${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}:${endSecondValue.toString().padStart(2, '0')}`;
         params.push(`end_time=${encodeURIComponent(endTime)}`);
+    }
+    
+    // Include session_key if a specific session is selected
+    if (currentSessionData && currentSessionData.session && currentSessionData.session.session_key) {
+        params.push(`session_key=${encodeURIComponent(currentSessionData.session.session_key)}`);
     }
     
     apiUrl += params.join('&');

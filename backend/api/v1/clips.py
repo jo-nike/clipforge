@@ -58,7 +58,7 @@ async def create_clip(
 
         # Get user's session (specific session if key provided, otherwise current session)
         if request.session_key:
-            logger.debug(f"Using specific session {request.session_key} for user {current_user.username}")
+            logger.debug(f"Using specific session {request.session_key} for clip creation for user {current_user.username}")
             session = await plex_service.get_session_by_key(plex_token, current_user.username, request.session_key)
             if not session:
                 logger.warning(f"Specified session {request.session_key} not found for user {current_user.username}")
