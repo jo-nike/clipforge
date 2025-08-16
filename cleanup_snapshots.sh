@@ -2,9 +2,10 @@
 
 # Snapshot Cleanup Script
 # Removes snapshot files older than 5 minutes and their corresponding database records
+# Note: Thumbnails are not cleaned up here - they are deleted when parent files are deleted
 # Author: Generated for ClippeX2 project
 
-set -euo pipefail
+set -uo pipefail
 
 # Configuration - with Docker-friendly dynamic paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -26,13 +27,13 @@ check_dependencies() {
     fi
     
     if [[ ! -d "$SNAPSHOTS_DIR" ]]; then
-        log_message "ERROR: Snapshots directory does not exist: $SNAPSHOTS_DIR"
-        exit 1
+        log_message "WARNING: Snapshots directory does not exist: $SNAPSHOTS_DIR"
+        # Don't exit, just skip snapshots cleanup
     fi
     
     if [[ ! -f "$DATABASE_PATH" ]]; then
-        log_message "ERROR: Database file does not exist: $DATABASE_PATH"
-        exit 1
+        log_message "WARNING: Database file does not exist: $DATABASE_PATH"
+        # Don't exit, database operations will be skipped with errors logged
     fi
 }
 
@@ -42,14 +43,19 @@ remove_from_database() {
     local result
     
     # Remove the record from snapshots table
+    if [[ ! -f "$DATABASE_PATH" ]]; then
+        log_message "Database file does not exist, skipping database cleanup for: $file_path"
+        return 0
+    fi
+    
     result=$(sqlite3 "$DATABASE_PATH" "DELETE FROM snapshots WHERE file_path = '$file_path'; SELECT changes();" 2>/dev/null || echo "0")
     
     if [[ "$result" -gt 0 ]]; then
         log_message "Removed database record for: $file_path"
-        return 0
+        return 1  # Return 1 to indicate record was deleted
     else
         log_message "No database record found for: $file_path"
-        return 1
+        return 0  # Return 0 to indicate no record found (but not an error)
     fi
 }
 
@@ -60,8 +66,14 @@ cleanup_snapshots() {
     
     log_message "Starting snapshot cleanup - removing files older than $MINUTES_OLD minutes"
     
-    # Find files older than specified minutes
-    while IFS= read -r file; do
+    # Check if snapshots directory exists before processing
+    if [[ ! -d "$SNAPSHOTS_DIR" ]]; then
+        log_message "Skipping snapshot cleanup - directory does not exist: $SNAPSHOTS_DIR"
+        return 0
+    fi
+    
+    # Find files older than specified minutes and process them
+    while IFS= read -r -d '' file; do
         [[ -z "$file" ]] && continue
         
         # Get the absolute path for database lookup
@@ -71,6 +83,10 @@ cleanup_snapshots() {
         
         # Try to remove from database first
         if remove_from_database "$abs_file_path"; then
+            # Return value 0 means no record found - don't increment counter
+            true
+        else
+            # Return value 1 means record was deleted - increment counter
             ((db_records_deleted++))
         fi
         
@@ -81,11 +97,11 @@ cleanup_snapshots() {
         else
             log_message "ERROR: Failed to delete file: $file"
         fi
-        
-    done < <(find "$SNAPSHOTS_DIR" -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -mmin +$MINUTES_OLD 2>/dev/null)
+    done < <(find "$SNAPSHOTS_DIR" -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" \) -mmin +$MINUTES_OLD -print0 2>/dev/null)
     
     log_message "Cleanup completed - Files deleted: $files_deleted, DB records deleted: $db_records_deleted"
 }
+
 
 # Function to handle script interruption
 cleanup_on_exit() {
