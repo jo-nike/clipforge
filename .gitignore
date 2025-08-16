@@ -1,0 +1,81 @@
+# Python
+backend/__pycache__/*
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# DB
+*.db
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.cache/
+pytest_cache/
+.nox/
+test-results/
+examples/
+storage/
+
+# MyPy
+.mypy_cache/
+mypy_errors.txt
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Secure token storage (development only)
+secure_tokens.enc
+.token_key
+
+# Project specific
+static/pdfs/*.pdf
+test.csv
+test_returns.csv
+
+# Config
+config.toml
+local.toml
+.claude
+
+# Ideas and planning files
+*_IDEA.md
+*_NOTES.md
+IDEAS.md
+NOTES.md
+
+*.mkv
+static/*
+*.log

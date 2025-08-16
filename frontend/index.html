@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClipForge</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/theme.css">
+    <link rel="stylesheet" href="/static/css/components.css">
+    <link rel="stylesheet" href="/static/css/animations.css">
+    <!-- Video.js CSS -->
+    <link href="/static/css/video-js.css" rel="stylesheet">
+    <!-- Tooltip and small button styles -->
+    <style>
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 12px;
+            min-width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-small:hover {
+            background: var(--primary);
+            color: var(--background);
+            transform: translateY(-1px);
+        }
+        
+        
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        /* Video Editor Modal Styles */
+        .video-editor-modal {
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Video Preview Modal Styles */
+        #video-preview-modal .modal-content {
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .editor-video-section {
+            margin-bottom: 20px;
+        }
+
+        .editor-controls-modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .editor-controls-modal h4 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .marker-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .marker-info-modal {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .progress-container-modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .progress-container-modal h4 {
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .vjs-marker {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background-color: var(--warning);
+            border-radius: 2px;
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        .vjs-marker.start-marker {
+            background-color: var(--accent);
+        }
+
+        .vjs-marker.end-marker {
+            background-color: var(--danger);
+        }
+
+        .vjs-marker-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--overlay);
+            color: var(--card);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            var(--card)-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .vjs-marker:hover .vjs-marker-tooltip {
+            opacity: 1;
+        }
+
+        /* Frame Selection Modal Styles */
+        .frame-selection-modal {
+            max-width: 1000px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .frame-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            background: var(--surface);
+        }
+        
+        .frame-item {
+            position: relative;
+            border: 3px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--card);
+        }
+        
+        .frame-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(45, 55, 72, 0.15);
+        }
+        
+        .frame-item.selected {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(74, 85, 104, 0.15);
+        }
+        
+        .frame-item.center-frame {
+            border-color: var(--warning);
+        }
+        
+        .frame-item.center-frame.selected {
+            border-color: var(--accent);
+        }
+        
+        .frame-image {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .frame-info {
+            padding: 8px;
+            background: var(--card);
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        .frame-timestamp {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .frame-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        
+        .center-frame .frame-label {
+            color: var(--warning);
+            font-weight: 600;
+        }
+        
+        .frame-selection-overlay {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: var(--card);
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .frame-item.selected .frame-selection-overlay {
+            display: flex;
+        }
+        
+        .selection-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .selection-info {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .selection-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .frame-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
+            }
+            
+            .frame-image {
+                height: 80px;
+            }
+            
+            .selection-controls {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+
+        /* Large Frame Preview Modal Styles */
+        .large-frame-modal {
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(8px);
+        }
+
+        .large-frame-content {
+            max-width: 95vw;
+            max-height: 95vh;
+            width: auto;
+            background: var(--card);
+        }
+
+        .large-frame-body {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+        }
+
+        .large-frame-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        #large-frame-img {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease;
+        }
+
+        .large-frame-info {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .large-frame-timestamp {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .large-frame-type {
+            font-size: 1em;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* Clickable frame styles */
+        .clickable-frame {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+            border: 2px solid transparent;
+        }
+
+        .clickable-frame:hover {
+            transform: scale(1.05);
+            border-color: var(--primary);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Mobile responsive for large frame modal */
+        @media (max-width: 768px) {
+            .large-frame-content {
+                max-width: 98vw;
+                max-height: 98vh;
+                margin: 1vh;
+            }
+
+            .large-frame-body {
+                padding: 15px;
+                min-height: 300px;
+            }
+
+            #large-frame-img {
+                max-height: 60vh;
+            }
+
+            .large-frame-timestamp {
+                font-size: 1.1em;
+            }
+
+            .large-frame-type {
+                font-size: 0.9em;
+            }
+        }
+
+        /* Settings Card Styles */
+        .settings-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .settings-header {
+            padding: 12px 16px;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .settings-header:hover {
+            background: var(--surface);
+        }
+
+        .settings-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1em;
+        }
+
+        .settings-toggle {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            transition: transform 0.3s ease;
+        }
+
+        .settings-toggle.rotated {
+            transform: rotate(180deg);
+        }
+
+        .settings-content {
+            padding: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .settings-content.collapsed {
+            display: none !important;
+        }
+        
+        /* Make app logo clickable */
+        .app-header h1 {
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+        
+        .app-header h1:hover {
+            opacity: 0.8;
+        }
+
+        /* Thumbnail Styles - positioned in corner of card */
+        .clip-thumbnail-container {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 160px;
+            height: 90px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .clip-thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none; /* Initially hidden until loaded */
+            transition: opacity 0.3s ease;
+        }
+
+        /* Ensure clip-info has space for thumbnail */
+        .clip-info {
+            padding-right: 180px; /* Make room for larger thumbnail */
+        }
+
+        /* Responsive thumbnail adjustments */
+        @media (max-width: 768px) {
+            .clip-thumbnail-container {
+                width: 120px;
+                height: 67px;
+                top: 8px;
+                right: 8px;
+            }
+            
+            .clip-info {
+                padding-right: 140px; /* Adjust for smaller mobile thumbnail */
+            }
+            
+            .clip-item {
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body class="animate-fadeIn theme-transition">
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <h1>🎬 ClipForge</h1>
+                <div class="user-info" id="user-info" style="display: none;">
+                    <span class="user-avatar" id="user-avatar">👤</span>
+                    <span class="user-name" id="user-name">Loading...</span>
+                    <button id="logout-btn" class="btn btn-secondary">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div id="loading-container" class="loading-container">
+                <div class="spinner"></div>
+                <p>Loading your dashboard...</p>
+            </div>
+
+            <div id="dashboard-content" class="dashboard-content" style="display: none;">
+                <!-- Tab Navigation -->
+                <div class="tab-navigation">
+                    <button id="create-tab" class="tab-button active" onclick="switchTab('create')">
+                        <span class="tab-icon">🎬</span>
+                        <span class="tab-text">Create</span>
+                    </button>
+                    <button id="view-tab" class="tab-button" onclick="switchTab('view')">
+                        <span class="tab-icon">👁️</span>
+                        <span class="tab-text">View</span>
+                    </button>
+                </div>
+
+                <!-- Create Tab Content -->
+                <div id="create-tab-content" class="tab-content active">
+                <div class="current-session-section">
+                    <div class="session-header">
+                        <h2>🎥 Your Active Sessions</h2>
+                        <button id="refresh-session-btn" class="btn btn-secondary">🔄 Refresh</button>
+                    </div>
+                    <div id="session-content" class="session-content">
+                        <div class="session-loading">
+                            <div class="spinner"></div>
+                            <p>Loading your active sessions...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clip Creation Section -->
+                <div id="clip-creation-section" class="clip-creation-section" style="display: none;">
+                    
+                    <div class="clip-form">
+                        <div class="time-inputs" style="display: flex; gap: 16px; align-items: stretch;">
+                            <div class="time-group" style="flex: 1;">
+                                <label>Start Time:</label>
+                                <div class="time-input-row">
+                                    <input type="number" id="start-hour" placeholder="HH" min="0" max="23" class="time-input">
+                                    <span>:</span>
+                                    <input type="number" id="start-minute" placeholder="MM" min="0" max="59" class="time-input">
+                                    <span>:</span>
+                                    <input type="number" id="start-second" placeholder="SS" min="0" max="59" class="time-input">
+                                    <button class="btn-clear" onclick="clearStartTime()">🗑️</button>
+                                </div>
+                            </div>
+                            
+                            <div class="time-group" style="flex: 1;">
+                                <label>End Time:</label>
+                                <div class="time-input-row">
+                                    <input type="number" id="end-hour" placeholder="HH" min="0" max="23" class="time-input">
+                                    <span>:</span>
+                                    <input type="number" id="end-minute" placeholder="MM" min="0" max="59" class="time-input">
+                                    <span>:</span>
+                                    <input type="number" id="end-second" placeholder="SS" min="0" max="59" class="time-input">
+                                    <button class="btn-clear" onclick="clearEndTime()">🗑️</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="quick-duration-buttons">
+                            <div class="quick-actions" style="display: flex; gap: 8px; align-items: center; justify-content: center; margin-bottom: 10px;">
+                                <button id="use-current-time-btn" class="btn-small btn-outline-secondary">📍 Start</button>
+                                <button id="use-current-time-end-btn" class="btn-small btn-outline-secondary">📍 End</button>
+                            </div>
+                            <div class="duration-buttons">
+                                <button class="btn btn-secondary" onclick="addDuration(15)">+15s</button>
+                                <button class="btn btn-secondary" onclick="addDuration(30)">+30s</button>
+                                <button class="btn btn-secondary" onclick="addDuration(60)">+1m</button>
+                                <button class="btn btn-secondary" onclick="addDuration(120)">+2m</button>
+                                <button class="btn btn-secondary" onclick="addDuration(300)">+5m</button>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-card">
+                            <div class="settings-header" onclick="toggleSettings()">
+                                <span class="settings-title">⚙️ Settings</span>
+                                <span class="settings-toggle" id="settings-toggle">▼</span>
+                            </div>
+                            <div class="settings-content" id="settings-content" style="display: none;">
+                                <div class="clip-options">
+                                    <div class="option-group">
+                                        <label for="clip-quality">Quality:</label>
+                                        <div class="quality-selector-container">
+                                            <select id="clip-quality" class="form-select">
+                                                <option value="medium" selected>Medium</option>
+                                                <option value="high">High</option>
+                                                <option value="low">Low</option>
+                                            </select>
+                                            <div class="quality-info" id="quality-info">
+                                                <span class="quality-description">Balanced quality and file size</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="option-group">
+                                        <label for="clip-format">Format:</label>
+                                        <select id="clip-format" class="form-select">
+                                            <option value="mp4" selected>MP4</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="preview-section">
+                            <button id="preview-selection-btn" class="btn btn-outline-primary" onclick="previewSelection()">
+                                👁️ Preview Selection
+                            </button>
+                        </div>
+                        
+                        <!-- Screenshot Preview -->
+                        <div class="clip-preview" id="clip-preview" style="display: none;">
+                            <div class="preview-loading" id="preview-loading" style="display: none;">
+                                <div class="loading-spinner"></div>
+                                <p>Generating preview frames...</p>
+                            </div>
+                            <div class="screenshot-preview" id="screenshot-preview" style="display: none;">
+                                <div class="preview-frame">
+                                    <h4>📍 Start Frame</h4>
+                                    <img id="start-frame-img" src="" alt="Start frame preview" />
+                                    <p class="frame-timestamp" id="start-frame-time">--:--</p>
+                                </div>
+                                <div class="preview-frame">
+                                    <h4>🏁 End Frame</h4>
+                                    <img id="end-frame-img" src="" alt="End frame preview" />
+                                    <p class="frame-timestamp" id="end-frame-time">--:--</p>
+                                </div>
+                            </div>
+                            <div class="preview-error" id="preview-error" style="display: none;">
+                                <p>⚠️ Could not generate preview frames</p>
+                                <small>Manual time selection will still work for clip creation</small>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button id="create-clip-btn" class="btn btn-primary" onclick="createClip()">
+                                🎬 Create Video Clip
+                            </button>
+                            <button id="create-snapshot-btn" class="btn btn-secondary" onclick="createSnapshot()">
+                                📸 Take Snapshot
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="creation-status" class="creation-status" style="display: none;"></div>
+                </div>
+                </div>
+
+                <!-- View Tab Content -->
+                <div id="view-tab-content" class="tab-content">
+                <!-- Clips Gallery Section -->
+                <div id="clips-gallery-section" class="clips-gallery-section" style="display: none;">
+                    <div class="section-header">
+                        <h2>🎥 Your Clips</h2>
+                        <div class="clips-toolbar">
+                            <button id="refresh-clips-btn" class="btn btn-secondary" onclick="loadUserClips()">🔄 Refresh</button>
+                            <button id="bulk-select-btn" class="btn btn-outline-primary" onclick="toggleBulkSelectMode()">✓ Bulk Select</button>
+                            <div class="bulk-actions" id="bulk-actions" style="display: none;">
+                                <button id="bulk-delete-btn" class="btn btn-danger" onclick="bulkDeleteClips()">🗑️ Delete Selected</button>
+                                <span id="selection-count" class="selection-count">0 selected</span>
+                                <button class="btn btn-outline-secondary" onclick="clearSelection()">Clear Selection</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="clips-list" class="clips-list">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Loading your clips...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Pagination Controls -->
+                    <div id="clips-pagination" class="clips-pagination" style="display: none;">
+                        <div class="pagination-controls">
+                            <div class="page-size-selector">
+                                <label for="clips-per-page">Show:</label>
+                                <select id="clips-per-page" class="form-select">
+                                    <option value="5">5 per page</option>
+                                    <option value="10" selected>10 per page</option>
+                                    <option value="25">25 per page</option>
+                                </select>
+                            </div>
+                            
+                            <div class="pagination-info">
+                                1-10 of 0 clips
+                            </div>
+                            
+                            <div class="pagination-buttons">
+                                <button id="prev-page-btn" class="btn btn-outline-secondary" disabled>← Previous</button>
+                                <span class="page-indicator">
+                                    Page <span id="current-page">1</span> of <span id="total-pages">1</span>
+                                </span>
+                                <button id="next-page-btn" class="btn btn-outline-secondary" disabled>Next →</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+
+            </div>
+
+            <div id="error-container" class="error-container" style="display: none;">
+                <div class="error-content">
+                    <h2>❌ Authentication Required</h2>
+                    <p>You need to sign in to access this page.</p>
+                    <a href="/login" class="btn btn-primary">Go to Login</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Video Preview Modal -->
+    <div id="video-preview-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Video Preview</h3>
+                <button class="modal-close" onclick="closeVideoPreview()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <video 
+                    id="video-player" 
+                    class="video-js vjs-default-skin" 
+                    controls 
+                    preload="none" 
+                    width="100%" 
+                    height="400">
+                    <p class="vjs-no-js">
+                        To view this video please enable JavaScript, and consider upgrading to a 
+                        <a href="https://videojs.com/html5-video-support/" target="_blank">web browser that 
+                        <span>supports HTML5 video</span></a>.
+                    </p>
+                </video>
+                <div class="video-controls" style="margin-top: 15px;">
+                    <button class="btn btn-primary" onclick="editVideo()">✂️ Edit Video</button>
+                    <button class="btn btn-secondary" onclick="closeVideoPreview()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="modal" style="display: none;">
+        <div class="modal-content confirmation-modal">
+            <div class="modal-header">
+                <h3 id="confirmation-title">Confirm Action</h3>
+                <button class="modal-close" onclick="closeConfirmationModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmation-message">Are you sure you want to proceed?</p>
+                <div class="modal-actions">
+                    <button class="btn btn-danger" id="confirm-yes">Yes, Delete</button>
+                    <button class="btn btn-secondary" onclick="closeConfirmationModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div id="alert-modal" class="modal" style="display: none;">
+        <div class="modal-content alert-modal">
+            <div class="modal-header">
+                <h3 id="alert-title">Alert</h3>
+                <button class="modal-close" onclick="closeAlertModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="alert-message">Alert message</p>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="closeAlertModal()">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clip Success Modal -->
+    <div id="clip-success-modal" class="modal" style="display: none;">
+        <div class="modal-content clip-success-modal">
+            <div class="modal-header">
+                <button class="modal-close" onclick="closeClipSuccessModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="clip-success-content">
+                    <div class="clip-preview-section">
+                        <video 
+                            id="success-video-player" 
+                            class="success-video-preview" 
+                            controls 
+                            preload="metadata"
+                            width="100%"
+                            height="500">
+                            <p>Your browser doesn't support HTML5 video.</p>
+                        </video>
+                    </div>
+                    
+                    <div class="clip-details" id="clip-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Duration:</span>
+                            <span class="detail-value" id="clip-duration">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Format:</span>
+                            <span class="detail-value" id="clip-format-display">MP4</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Quality:</span>
+                            <span class="detail-value" id="clip-quality-display">Medium</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <a id="download-clip-btn" href="#" download class="btn btn-primary">📥 Download Clip</a>
+                    <button class="btn btn-secondary" onclick="editCreatedClip()">✂️ Edit Clip</button>
+                    <button class="btn btn-secondary" onclick="closeClipSuccessModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Editor Modal -->
+    <div id="video-editor-modal" class="modal" style="display: none;">
+        <div class="modal-content video-editor-modal">
+            <div class="modal-header">
+                <h3 id="editor-modal-title">✂️ Video Editor</h3>
+                <button class="modal-close" onclick="closeVideoEditorModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="editor-video-section">
+                    <video 
+                        id="editor-modal-video-player" 
+                        class="video-js vjs-default-skin" 
+                        controls 
+                        preload="auto" 
+                        width="100%" 
+                        height="350">
+                        <p class="vjs-no-js">
+                            To view this video please enable JavaScript, and consider upgrading to a 
+                            <a href="https://videojs.com/html5-video-support/" target="_blank">web browser that 
+                            <span>supports HTML5 video</span></a>.
+                        </p>
+                    </video>
+                </div>
+                
+                <div class="editor-controls-modal">
+                    <div class="control-group">
+                        <h4>🎯 Trim Markers</h4>
+                        <div class="marker-controls">
+                            <button class="btn btn-primary" onclick="setStartMarkerModal()">📍 Set Start</button>
+                            <button class="btn btn-primary" onclick="setEndMarkerModal()">🏁 Set End</button>
+                            <button class="btn btn-secondary" onclick="clearMarkersModal()">🗑️ Clear All</button>
+                            <button class="btn btn-secondary" onclick="previewTrimModal()">👁️ Preview Trim</button>
+                        </div>
+                        
+                        <div class="marker-info-modal">
+                            <div class="trim-preview">
+                                <span>Start: <span id="start-time-modal">Not set</span></span>
+                                <span>End: <span id="end-time-modal">Not set</span></span>
+                                <span class="duration-info">Duration: <span id="trim-duration-modal">--</span></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" onclick="processVideoModal()" id="process-btn-modal">
+                            🎬 Process Video
+                        </button>
+                        <button class="btn btn-secondary" onclick="closeVideoEditorModal()">Cancel</button>
+                    </div>
+                </div>
+                
+                <div class="progress-container-modal" id="progress-container-modal" style="display: none;">
+                    <h4>🔄 Processing Video...</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill-modal"></div>
+                    </div>
+                    <p id="progress-text-modal">Initializing...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/theme.js"></script>
+    <script src="/static/js/app.js"></script>
+
+    <!-- Frame Selection Modal -->
+    <div id="frame-selection-modal" class="modal" style="display: none;">
+        <div class="modal-content frame-selection-modal">
+            <div class="modal-header">
+                <h3>📸 Select Frames to Download</h3>
+                <button class="modal-close" onclick="closeFrameSelectionModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="frame-selection-content">
+                    <div class="frame-grid" id="frame-grid">
+                        <!-- Frames will be populated dynamically -->
+                    </div>
+                    
+                    <div class="selection-controls">
+                        <div class="selection-info">
+                            <span id="selected-count">0</span> frame(s) selected
+                        </div>
+                        <div class="selection-actions">
+                            <button class="btn btn-secondary" onclick="selectAllFrames()">Select All</button>
+                            <button class="btn btn-secondary" onclick="clearFrameSelection()">Clear Selection</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-primary" onclick="downloadSelectedFrames()" id="download-frames-btn">
+                        📥 Download Selected Frames
+                    </button>
+                    <button class="btn btn-secondary" onclick="closeFrameSelectionModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Selection Modal -->
+    <div id="preview-selection-modal" class="modal" style="display: none;">
+        <div class="modal-content frame-selection-modal">
+            <div class="modal-header">
+                <h3>👁️ Preview Selection</h3>
+                <button class="modal-close" onclick="closePreviewSelectionModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="preview-loading" id="preview-modal-loading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <p>Generating preview frames...</p>
+                </div>
+                <div class="screenshot-preview" id="preview-modal-content" style="display: none;">
+                    <div class="preview-frame" id="preview-modal-start-frame">
+                        <h4>📍 Start Frame</h4>
+                        <img id="preview-modal-start-img" src="" alt="Start frame preview" onclick="openLargeFramePreview('start')" class="clickable-frame" />
+                        <p class="frame-timestamp" id="preview-modal-start-time">--:--</p>
+                    </div>
+                    <div class="preview-frame" id="preview-modal-end-frame">
+                        <h4>🏁 End Frame</h4>
+                        <img id="preview-modal-end-img" src="" alt="End frame preview" onclick="openLargeFramePreview('end')" class="clickable-frame" />
+                        <p class="frame-timestamp" id="preview-modal-end-time">--:--</p>
+                    </div>
+                </div>
+                <div class="preview-error" id="preview-modal-error" style="display: none;">
+                    <p>⚠️ Could not generate preview frames</p>
+                    <small>Manual time selection will still work for clip creation</small>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closePreviewSelectionModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Large Frame Preview Modal -->
+    <div id="large-frame-preview-modal" class="modal large-frame-modal" style="display: none;">
+        <div class="modal-content large-frame-content">
+            <div class="modal-header">
+                <h3 id="large-frame-title">Frame Preview</h3>
+                <button class="modal-close" onclick="closeLargeFramePreview()">&times;</button>
+            </div>
+            <div class="modal-body large-frame-body">
+                <div class="large-frame-container">
+                    <img id="large-frame-img" src="" alt="Large frame preview" />
+                    <div class="large-frame-info">
+                        <p class="large-frame-timestamp" id="large-frame-time">--:--</p>
+                        <p class="large-frame-type" id="large-frame-type">Start Frame</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video.js JavaScript -->
+    <script src="/static/js/video.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+services:
+  clipforge:
+    image: jonnike/clipforge:latest
+    container_name: clipforge
+    ports:
+      - "8002:8002"
+    environment:
+      - CLIPFORGE_JWT_SECRET=generate_a_long(32char)_secure_string_for_this_value
+      - CLIPFORGE_PLEX_SERVER_TOKEN=XXXXXXXXXXXXXXXXXXX
+    volumes:
+      # Persistent storage for clips, snapshots, thumbnails, and database
+      - /volumes/clipforge:/app/static
+      - /media:/media
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8002/api/health', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
