@@ -121,15 +121,15 @@ ClipForge is a web-based video clipping application that allows you to create cl
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `CLIPFORGE_JWT_SECRET` | JWT signing secret (required) | None |
-| `CLIPFORGE_PLEX_SERVER_NAME` | Your Plex server name | None |
+| `CLIPFORGE_JWT_SECRET` | JWT signing secret (required, min 32 chars) | None |
+| `CLIPFORGE_PLEX_SERVER_TOKEN` | Plex server authentication token (required) | None |
 | `CLIPFORGE_PORT` | Application port | 8002 |
 | `CLIPFORGE_HOST` | Application host | 0.0.0.0 |
 
 ### Docker Volumes
 
-- `/app/static` - Persistent storage for clips, snapshots, and database
-- `/media` - Mount your media files for processing
+- `/app/static` - Persistent storage for clips, snapshots, thumbnails, and database
+- `/media` - Mount your media files for processing (read-only recommended)
 
 ## Usage
 
@@ -196,11 +196,11 @@ python3 backend/main.py
 
 1. **Configure environment**
    ```bash
-   # Use strong JWT secret
+   # Use strong JWT secret (minimum 32 characters)
    CLIPFORGE_JWT_SECRET=$(openssl rand -base64 32)
    
-   # Set your Plex server details
-   CLIPFORGE_PLEX_SERVER_NAME="Your Production Plex Server"
+   # Set your Plex server token (get from Plex settings)
+   CLIPFORGE_PLEX_SERVER_TOKEN="your-plex-token-here"
    ```
 
 2. **Set up volumes**
@@ -221,7 +221,10 @@ python3 backend/main.py
 
 ### Health Monitoring
 
-The application includes health checks at `/api/health` and Docker health monitoring.
+The application includes:
+- Health endpoint at `/api/health` for service status
+- Docker health checks with automatic container restart on failure
+- Configurable check intervals and retry policies
 
 ## Security
 
@@ -235,7 +238,6 @@ The application includes health checks at `/api/health` and Docker health monito
 
 - Videos longer than a few minutes may require extra processing time
 - Large file processing is handled synchronously (async queue planned)
-- Mobile video editing has limited functionality
 
 ## Contributing
 
