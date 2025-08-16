@@ -258,7 +258,9 @@ class PlexService(IPlexService):
             self.logger.error(f"Failed to get all sessions for {username}: {e}")
             raise SessionNotFoundError(f"Failed to retrieve user sessions: {e}")
 
-    async def get_session_by_key(self, plex_token: str, username: str, session_key: str) -> Optional[SessionInfo]:
+    async def get_session_by_key(
+        self, plex_token: str, username: str, session_key: str
+    ) -> Optional[SessionInfo]:
         """Get a specific user session by session key"""
         try:
             self.logger.debug(f"Getting session by key {session_key} for user: {username}")
@@ -269,8 +271,10 @@ class PlexService(IPlexService):
             )
 
             for session, server in sessions_with_servers:
-                if (session.username.lower() == username.lower() and 
-                    session.session_key == session_key):
+                if (
+                    session.username.lower() == username.lower()
+                    and session.session_key == session_key
+                ):
                     self.logger.info(f"Found session {session_key} for user {username}")
                     # Set server context for file path resolution
                     setattr(session, "_server_context", server)

@@ -165,8 +165,12 @@ async def generate_preview_frames(
 
         # Get user's session (specific session if key provided, otherwise current session)
         if session_key:
-            logger.debug(f"Using specific session {session_key} for preview frames for user {current_user.username}")
-            session = await plex_service.get_session_by_key(plex_token, current_user.username, session_key)
+            logger.debug(
+                f"Using specific session {session_key} for preview frames for user {current_user.username}"
+            )
+            session = await plex_service.get_session_by_key(
+                plex_token, current_user.username, session_key
+            )
             if not session:
                 logger.warning(
                     f"Specified session {session_key} not found for preview frames for user {current_user.username}",
@@ -177,7 +181,9 @@ async def generate_preview_frames(
                     detail="Specified session not found",
                 )
         else:
-            logger.debug(f"Using current session for preview frames for user {current_user.username}")
+            logger.debug(
+                f"Using current session for preview frames for user {current_user.username}"
+            )
             session = await plex_service.get_current_session(plex_token, current_user.username)
             if not session:
                 logger.warning(
@@ -247,8 +253,12 @@ async def create_snapshot(
 
         # Get user's session (specific session if key provided, otherwise current session)
         if request.session_key:
-            logger.debug(f"Using specific session {request.session_key} for snapshot for user {current_user.username}")
-            session = await plex_service.get_session_by_key(plex_token, current_user.username, request.session_key)
+            logger.debug(
+                f"Using specific session {request.session_key} for snapshot for user {current_user.username}"
+            )
+            session = await plex_service.get_session_by_key(
+                plex_token, current_user.username, request.session_key
+            )
             if not session:
                 logger.warning(
                     f"Specified session {request.session_key} not found for snapshot for user {current_user.username}",
@@ -327,8 +337,12 @@ async def create_multi_frame_snapshots(
 
         # Get user's session (specific session if key provided, otherwise current session)
         if request.session_key:
-            logger.debug(f"Using specific session {request.session_key} for multi-frame snapshots for user {current_user.username}")
-            session = await plex_service.get_session_by_key(plex_token, current_user.username, request.session_key)
+            logger.debug(
+                f"Using specific session {request.session_key} for multi-frame snapshots for user {current_user.username}"
+            )
+            session = await plex_service.get_session_by_key(
+                plex_token, current_user.username, request.session_key
+            )
             if not session:
                 logger.warning(
                     f"Specified session {request.session_key} not found for multi-frame snapshots for user {current_user.username}",
@@ -339,7 +353,9 @@ async def create_multi_frame_snapshots(
                     detail="Specified session not found",
                 )
         else:
-            logger.debug(f"Using current session for multi-frame snapshots for user {current_user.username}")
+            logger.debug(
+                f"Using current session for multi-frame snapshots for user {current_user.username}"
+            )
             session = await plex_service.get_current_session(plex_token, current_user.username)
             if not session:
                 logger.warning(
