@@ -2,6 +2,25 @@
 
 ClipForge is a web-based video clipping application that allows you to create clips from your Plex media server sessions. Monitor what's currently playing, generate precise video clips with frame-accurate trimming, and manage your video collection through an intuitive web interface.
 
+Main interface:
+<img width="1178" height="1093" alt="maininterface" src="https://github.com/user-attachments/assets/6d28e3b1-bdb7-45ab-97bf-3ea7ab5b90c1" />
+
+Preview first and last frames:
+<img width="1143" height="996" alt="preview" src="https://github.com/user-attachments/assets/70f335ac-dc4f-467b-a58e-7879d01310f5" />
+
+Multi frame snapshot to catch that frame you're looking for
+<img width="999" height="692" alt="multiframesnapshot" src="https://github.com/user-attachments/assets/35ba018e-7254-4b07-b223-e8b42122e502" />
+
+Video.js to view video
+<img width="1150" height="1098" alt="viewvid" src="https://github.com/user-attachments/assets/30013e1b-b63e-4b83-a15e-eded6af8b035" />
+
+Easy cropping to get the timing just right
+<img width="1130" height="1059" alt="crop" src="https://github.com/user-attachments/assets/d942bacf-d79d-424c-902e-76250507bd49" />
+
+Quick interface to view past creations
+<img width="1139" height="1121" alt="viewtab" src="https://github.com/user-attachments/assets/324dfcff-cac2-4cf9-8f83-7b852aafc063" />
+
+
 ## Features
 
 - **Live Session Monitoring**: Track active Plex media server sessions in real-time
