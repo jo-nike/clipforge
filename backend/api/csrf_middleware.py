@@ -50,8 +50,20 @@ class CSRFMiddleware(BaseHTTPMiddleware):
             self._set_csrf_cookie(response)
             return response
 
+        # Skip CSRF protection for browser extensions
+        origin = request.headers.get("origin", "")
+        if origin.startswith("chrome-extension://") or origin.startswith("moz-extension://"):
+            logger.info(f"CSRF exempt for browser extension: {origin}")
+            extension_response: Response = await call_next(request)
+            self._set_csrf_cookie(extension_response)
+            return extension_response
+
         # Skip CSRF protection for exempt path patterns
-        if self._is_exempt_path(request.url.path):
+        request_path = request.url.path
+        logger.debug(f"Checking CSRF exemption for path: {request_path}")
+        
+        if self._is_exempt_path(request_path):
+            logger.info(f"CSRF exempt path: {request_path}")
             exempt_response: Response = await call_next(request)
             self._set_csrf_cookie(exempt_response)
             return exempt_response
@@ -204,9 +216,11 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
 
         # Paths that support API key authentication
         self.api_key_paths = {
+            "/api/v1/auth",     # Allow API key for auth endpoints
             "/api/v1/clips",
             "/api/v1/sessions",
             "/api/v1/storage",
+            "/api/v1/users",    # Allow API key for user endpoints
         }
 
         logger.info(f"API key middleware initialized for header: {api_key_header}")
@@ -263,14 +277,18 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
 
     async def _validate_api_key(self, api_key: str) -> Optional[Dict[str, Any]]:
         """Validate API key and return user context"""
-        # This is a placeholder - in production, validate against database
-        # For now, we'll just check if it's a valid format
-
+        from core.constants import DEFAULT_API_KEY
+        
         if not api_key or len(api_key) < 32:
             return None
 
-        # In production, query database for API key
-        # For now, return a mock user context
+        # Check against the configured API key
+        # In production, this should check against a database of user API keys
+        if api_key != DEFAULT_API_KEY:
+            logger.warning(f"Invalid API key attempted: {api_key[:8]}...")
+            return None
+
+        # Return user context for valid API key
         return {
             "user_id": "api_user",
             "username": "API User",

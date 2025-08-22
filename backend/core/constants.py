@@ -17,7 +17,15 @@ DEFAULT_DATABASE_URL = "sqlite:///static/db/database.db"
 DEFAULT_DATABASE_POOL_SIZE = 5
 
 # CORS Defaults
-DEFAULT_CORS_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:8000"]
+DEFAULT_CORS_ORIGINS = [
+    "http://localhost:3000", 
+    "http://127.0.0.1:3000", 
+    "http://localhost:8000",
+    "http://localhost:8001",
+    "http://localhost:8002",
+    "chrome-extension://*",  # Allow all Chrome extensions
+    "moz-extension://*"      # Allow all Firefox extensions
+]
 
 # Storage Defaults
 DEFAULT_CLIPS_STORAGE_PATH = "static/clips"
@@ -44,3 +52,12 @@ DEFAULT_USER_VIDEO_LIMIT = 60
 DEFAULT_DEBUG = False
 DEFAULT_TEST_MODE = False
 DEFAULT_TEST_VIDEO_FILE = "test.mkv"
+
+# API Key for testing (32+ characters required)
+# In production, this should be stored securely and per-user
+DEFAULT_API_KEY = "cf_test_key_a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6"
+
+# Development Plex Token (for API key authenticated users)
+# This should be set to your actual Plex token for development
+# You can get this from Plex Web Developer Console: localStorage.myPlexAccessToken
+DEFAULT_DEV_PLEX_TOKEN = None  # Set this to your Plex token for testing

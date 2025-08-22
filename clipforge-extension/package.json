@@ -1,0 +1,39 @@
+{
+  "name": "clipforge-extension",
+  "version": "1.0.0",
+  "description": "ClipForge Browser Extension for Plex",
+  "scripts": {
+    "build:chrome": "npm run clean && npm run copy:chrome && npm run zip:chrome",
+    "build:firefox": "npm run clean && npm run copy:firefox && npm run zip:firefox",
+    "build:all": "npm run build:chrome && npm run build:firefox",
+    "clean": "rm -rf build/",
+    "copy:chrome": "mkdir -p build/chrome && cp -r src icons manifest.json build/chrome/",
+    "copy:firefox": "mkdir -p build/firefox && cp -r src icons manifest.v2.json build/firefox/ && mv build/firefox/manifest.v2.json build/firefox/manifest.json",
+    "zip:chrome": "cd build/chrome && zip -r ../clipforge-chrome.zip * && cd ../..",
+    "zip:firefox": "cd build/firefox && zip -r ../clipforge-firefox.zip * && cd ../..",
+    "dev": "npm run copy:chrome",
+    "test": "echo \"No tests configured yet\"",
+    "lint": "eslint src/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/clipforge"
+  },
+  "keywords": [
+    "plex",
+    "clipforge",
+    "browser-extension",
+    "chrome",
+    "firefox",
+    "video",
+    "clips"
+  ],
+  "author": "ClipForge Team",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

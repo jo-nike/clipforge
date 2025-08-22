@@ -1,0 +1,136 @@
+.clipforge-button-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.clipforge-button {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 8px 12px;
+  margin: 0 2px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 500;
+  min-width: 60px;
+  height: 36px;
+  position: relative;
+  outline: none;
+}
+
+.clipforge-button:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
+}
+
+.clipforge-button:active:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(0.98);
+}
+
+.clipforge-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.clipforge-button:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+.clipforge-button-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.clipforge-button.clipforge-pending {
+  background-color: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+  animation: pulse 1.5s infinite;
+}
+
+.clipforge-button.clipforge-success {
+  background-color: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+}
+
+.clipforge-button.clipforge-success .clipforge-button-icon {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.clipforge-button.clipforge-error {
+  background-color: rgba(244, 67, 54, 0.2);
+  color: #f44336;
+}
+
+.clipforge-button.clipforge-error .clipforge-button-icon {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.clipforge-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.95);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 10000;
+}
+
+.clipforge-button:hover .clipforge-tooltip {
+  opacity: 1;
+}
+
+.clipforge-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.95);
+}
+
+@media (max-width: 768px) {
+  .clipforge-button {
+    padding: 6px 8px;
+    min-width: 50px;
+    height: 32px;
+  }
+  
+  .clipforge-button-icon {
+    font-size: 11px;
+  }
+}

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Icons</title>
+</head>
+<body>
+    <h1>ClipForge Extension Icons</h1>
+    <p>Right-click and save each icon:</p>
+    
+    <div id="icons"></div>
+    
+    <script>
+        function createIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            
+            // Draw rounded rectangle
+            const radius = size / 6;
+            const padding = size / 8;
+            
+            ctx.beginPath();
+            ctx.moveTo(padding + radius, padding);
+            ctx.lineTo(size - padding - radius, padding);
+            ctx.quadraticCurveTo(size - padding, padding, size - padding, padding + radius);
+            ctx.lineTo(size - padding, size - padding - radius);
+            ctx.quadraticCurveTo(size - padding, size - padding, size - padding - radius, size - padding);
+            ctx.lineTo(padding + radius, size - padding);
+            ctx.quadraticCurveTo(padding, size - padding, padding, size - padding - radius);
+            ctx.lineTo(padding, padding + radius);
+            ctx.quadraticCurveTo(padding, padding, padding + radius, padding);
+            ctx.closePath();
+            
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            // Draw text
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${size * 0.5}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('C', size / 2, size / 2);
+            
+            return canvas;
+        }
+        
+        function createErrorIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Background (red for error)
+            const radius = size / 6;
+            const padding = size / 8;
+            
+            ctx.beginPath();
+            ctx.moveTo(padding + radius, padding);
+            ctx.lineTo(size - padding - radius, padding);
+            ctx.quadraticCurveTo(size - padding, padding, size - padding, padding + radius);
+            ctx.lineTo(size - padding, size - padding - radius);
+            ctx.quadraticCurveTo(size - padding, size - padding, size - padding - radius, size - padding);
+            ctx.lineTo(padding + radius, size - padding);
+            ctx.quadraticCurveTo(padding, size - padding, padding, size - padding - radius);
+            ctx.lineTo(padding, padding + radius);
+            ctx.quadraticCurveTo(padding, padding, padding + radius, padding);
+            ctx.closePath();
+            
+            ctx.fillStyle = '#f44336';
+            ctx.fill();
+            
+            // Draw text
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${size * 0.5}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('C', size / 2, size / 2);
+            
+            return canvas;
+        }
+        
+        const sizes = [16, 48, 128];
+        const container = document.getElementById('icons');
+        
+        sizes.forEach(size => {
+            const div = document.createElement('div');
+            div.style.margin = '20px';
+            
+            const label = document.createElement('h3');
+            label.textContent = `icon-${size}.png`;
+            div.appendChild(label);
+            
+            const canvas = createIcon(size);
+            div.appendChild(canvas);
+            
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = `icon-${size}.png`;
+            link.textContent = ' Download';
+            div.appendChild(link);
+            
+            // Error variant
+            const errorLabel = document.createElement('h3');
+            errorLabel.textContent = `icon-${size}-error.png`;
+            div.appendChild(errorLabel);
+            
+            const errorCanvas = createErrorIcon(size);
+            div.appendChild(errorCanvas);
+            
+            const errorLink = document.createElement('a');
+            errorLink.href = errorCanvas.toDataURL('image/png');
+            errorLink.download = `icon-${size}-error.png`;
+            errorLink.textContent = ' Download';
+            div.appendChild(errorLink);
+            
+            container.appendChild(div);
+        });
+        
+        // Auto-download all icons
+        setTimeout(() => {
+            document.querySelectorAll('a').forEach(link => link.click());
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -304,9 +304,33 @@ def setup_middleware(app: FastAPI) -> None:
     app.add_middleware(RequestTrackingMiddleware)
 
     # CORS (last, to handle preflight requests)
+    # Custom origin validation to support browser extensions
+    def is_allowed_origin(origin: str) -> bool:
+        """Check if origin is allowed, including browser extensions"""
+        if not origin:
+            return False
+        
+        # Check exact matches
+        if origin in settings.cors_origins:
+            return True
+        
+        # Check for browser extension patterns
+        if origin.startswith("chrome-extension://") or origin.startswith("moz-extension://"):
+            # Check if we have wildcard patterns in settings
+            if "chrome-extension://*" in settings.cors_origins and origin.startswith("chrome-extension://"):
+                return True
+            if "moz-extension://*" in settings.cors_origins and origin.startswith("moz-extension://"):
+                return True
+        
+        return False
+    
+    # Build allowed origins list, filtering out wildcard patterns
+    concrete_origins = [o for o in settings.cors_origins if not o.endswith("*")]
+    
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.cors_origins,
+        allow_origins=concrete_origins if concrete_origins else ["*"],  # Use * if only wildcards specified
+        allow_origin_regex="(chrome-extension://.*|moz-extension://.*)",  # Allow all browser extensions
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allow_headers=["*"],

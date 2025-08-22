@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ClipForge Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="options-container">
+    <header class="header">
+      <img src="/icons/icon-48.png" alt="ClipForge" class="logo">
+      <h1>ClipForge Settings</h1>
+    </header>
+    
+    <div class="settings-content">
+      <section class="settings-section">
+        <h2>API Configuration</h2>
+        <div class="form-group">
+          <label for="apiUrl">
+            API URL
+            <span class="help-text">The URL of your ClipForge server</span>
+          </label>
+          <input type="url" id="apiUrl" placeholder="http://localhost:8002" class="form-input">
+        </div>
+        
+        <div class="form-group">
+          <label for="apiKey">
+            API Key
+            <span class="help-text">Your ClipForge API key (min 32 characters)</span>
+          </label>
+          <input type="text" id="apiKey" placeholder="cf_test_key_..." class="form-input" minlength="32">
+        </div>
+        
+        <div class="form-group">
+          <button id="testConnectionBtn" class="btn btn-secondary">Test Connection</button>
+          <span id="connectionStatus" style="margin-left: 10px;"></span>
+        </div>
+      </section>
+      
+      <section class="settings-section">
+        <h2>Clip Settings</h2>
+        <div class="form-group">
+          <label for="clipDuration">
+            Default clip duration
+            <span class="help-text">How many seconds to capture for each clip</span>
+          </label>
+          <select id="clipDuration" class="form-select">
+            <option value="15">15 seconds</option>
+            <option value="30" selected>30 seconds</option>
+            <option value="60">1 minute</option>
+            <option value="120">2 minutes</option>
+            <option value="180">3 minutes</option>
+            <option value="300">5 minutes</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="autoTitle" checked>
+            <span>Auto-generate clip titles</span>
+            <span class="help-text">Automatically create descriptive titles based on the content</span>
+          </label>
+        </div>
+      </section>
+      
+      <section class="settings-section">
+        <h2>Keyboard Shortcuts</h2>
+        <div class="form-group">
+          <label for="prevShortcut">
+            Previous clip
+            <span class="help-text">Create a clip from the last X seconds</span>
+          </label>
+          <div class="shortcut-input">
+            <kbd id="prevShortcut" class="kbd">Alt + [</kbd>
+            <button class="btn-small" id="editPrevShortcut">Edit</button>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="nextShortcut">
+            Next clip
+            <span class="help-text">Create a clip for the next X seconds</span>
+          </label>
+          <div class="shortcut-input">
+            <kbd id="nextShortcut" class="kbd">Alt + ]</kbd>
+            <button class="btn-small" id="editNextShortcut">Edit</button>
+          </div>
+        </div>
+      </section>
+      
+      <section class="settings-section">
+        <h2>Advanced</h2>
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="debugMode">
+            <span>Enable debug mode</span>
+            <span class="help-text">Show detailed logs in the browser console</span>
+          </label>
+        </div>
+        
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="notifications" checked>
+            <span>Show notifications</span>
+            <span class="help-text">Display notifications when clips are created</span>
+          </label>
+        </div>
+      </section>
+      
+      <div class="actions">
+        <button id="saveBtn" class="btn btn-primary">Save Settings</button>
+        <button id="resetBtn" class="btn btn-secondary">Reset to Defaults</button>
+      </div>
+      
+      <div id="statusMessage" class="status-message" style="display: none;"></div>
+    </div>
+    
+    <footer class="footer">
+      <p>ClipForge Extension v1.0.0</p>
+      <div class="footer-links">
+        <a href="https://github.com/yourusername/clipforge" target="_blank">GitHub</a>
+        <a href="http://localhost:8000/docs" target="_blank">Documentation</a>
+        <a href="http://localhost:8000" target="_blank">Dashboard</a>
+      </div>
+    </footer>
+  </div>
+  
+  <div id="shortcutModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h3>Press your desired key combination</h3>
+      <div class="shortcut-display" id="shortcutDisplay">Waiting...</div>
+      <div class="modal-actions">
+        <button id="shortcutCancel" class="btn btn-secondary">Cancel</button>
+        <button id="shortcutSave" class="btn btn-primary" disabled>Save</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ClipForge for Plex</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <div class="header">
+      <img src="/icons/icon-48.png" alt="ClipForge" class="logo">
+      <h2>ClipForge for Plex</h2>
+    </div>
+    
+    <div class="status-section">
+      <div class="status-indicator" id="connectionStatus"></div>
+      <span id="statusText">Checking connection...</span>
+    </div>
+    
+    <div class="user-section" id="userInfo" style="display: none;">
+      <img id="userAvatar" src="" alt="User avatar" class="user-avatar">
+      <div class="user-details">
+        <span id="username" class="username"></span>
+        <span id="userEmail" class="user-email"></span>
+      </div>
+    </div>
+    
+    <div class="actions">
+      <button id="connectBtn" class="btn btn-primary" style="display: none;">
+        Connect to ClipForge
+      </button>
+      <button id="disconnectBtn" class="btn btn-secondary" style="display: none;">
+        Disconnect
+      </button>
+      <button id="settingsBtn" class="btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3"></path>
+        </svg>
+        Settings
+      </button>
+    </div>
+    
+    <div class="recent-clips" id="recentClips" style="display: none;">
+      <h3>Recent Clips</h3>
+      <div id="clipsList" class="clips-list">
+        <div class="loading">Loading clips...</div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <a href="http://localhost:8000" target="_blank" class="footer-link">Open ClipForge Dashboard</a>
+    </div>
+  </div>
+  
+  <script type="module" src="popup-simple.js"></script>
+</body>
+</html>

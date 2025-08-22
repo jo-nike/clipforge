@@ -1,0 +1,44 @@
+{
+  "manifest_version": 2,
+  "name": "ClipForge for Plex",
+  "version": "1.0.0",
+  "description": "Create instant clips from Plex with one click",
+  "permissions": [
+    "storage",
+    "tabs",
+    "notifications",
+    "https://app.plex.tv/*",
+    "https://watch.plex.tv/*",
+    "http://localhost:8000/*",
+    "http://localhost:8001/*"
+  ],
+  "background": {
+    "scripts": ["src/background/background.js"],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://app.plex.tv/*", "*://watch.plex.tv/*"],
+      "js": ["src/content/content.js"],
+      "css": ["src/content/styles.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "browser_action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "options_ui": {
+    "page": "src/options/options.html",
+    "open_in_tab": true
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  }
+}
