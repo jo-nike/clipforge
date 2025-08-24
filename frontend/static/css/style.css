@@ -2334,21 +2334,32 @@ body {
     .clip-form {
         padding: 20px;
         margin-bottom: 20px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
     
     .time-inputs {
         grid-template-columns: 1fr;
         gap: 15px;
+        display: flex;
+        flex-direction: column;
     }
     
     .time-group {
         padding: 15px;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: relative;
+        z-index: 10;
     }
     
     .time-input {
-        width: 60px;
-        height: 45px;
-        font-size: 1.1em;
+        width: 70px;
+        height: 44px; /* Touch-friendly size */
+        font-size: 16px; /* Prevent zoom on iOS */
+        min-height: 44px;
     }
     
     .time-input-row {
@@ -2450,6 +2461,36 @@ body {
     
     .no-clips p {
         font-size: 1em;
+    }
+}
+
+/* Extra responsive fixes for very small screens (320px+) */
+@media (max-width: 480px) {
+    .time-inputs {
+        gap: 12px;
+    }
+    
+    .time-group {
+        padding: 12px;
+    }
+    
+    .time-input {
+        width: 65px;
+        height: 44px;
+        font-size: 16px;
+    }
+    
+    .time-input-row {
+        gap: 6px;
+    }
+    
+    .time-input-row span {
+        font-size: 1.1em;
+    }
+    
+    .btn-clear {
+        padding: 8px 10px;
+        font-size: 0.9em;
     }
 }
 
